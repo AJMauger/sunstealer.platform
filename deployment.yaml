@@ -1,0 +1,119 @@
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   name: sunstealer-platform
+# provisioner: kubernetes.io/no-provisioner
+# volumeBindingMode: WaitForFirstConsumer
+# ---
+
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   labels:
+#     name: sunstealer-platform
+#   name: sunstealer-platform
+# spec:
+#   capacity:
+#     storage: 1Gi
+#   accessModes:
+#     - ReadWriteMany
+#   persistentVolumeReclaimPolicy: Retain
+#   storageClassName: sunstealer-platform
+#   hostPath:
+#     path: /home/ajm/src
+#   nodeAffinity:
+#     required:
+#       nodeSelectorTerms:
+#         - matchExpressions:
+#             - key: kubernetes.io/hostname
+#               operator: In
+#               values:
+#                 # kubectl get nodes --show-labels
+#                 - ajmfco37-02
+#                 - ajmfco37-03
+# ---
+
+# kind: PersistentVolumeClaim
+# apiVersion: v1
+# metadata:
+#   name: sunstealer-platform
+# spec:
+#   accessModes:
+#     - ReadWriteMany
+#   storageClassName: sunstealer-platform
+#   resources:
+#     requests:
+#       storage: 1Gi
+# ---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sunstealer-platform
+  name: sunstealer-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sunstealer-platform
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: sunstealer-platform
+    spec:
+      imagePullSecrets:
+        - name: docker
+      containers:
+        - name: sunstealer-platform
+          image: ajmfco37-01.ajm.net:5000/sunstealer-platform:latest
+          env:
+          ports:
+            - containerPort: 8080
+              name: w3
+      #     volumeMounts:
+      #       - name: sunstealer-platform
+      #         mountPath: "/src"
+      # volumes:
+      #   - name: sunstealer-platform
+      #     persistentVolumeClaim:
+      #       claimName: sunstealer-platform
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: sunstealer-platform
+spec:
+  selector:
+    app: sunstealer-platform
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  name: sunstealer-platform
+  namespace: default
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: 
+      - "*.ajm.net"
+      secretName: sunstealer
+  rules:
+    - host: "*.ajm.net"
+      http:
+        paths:
+          - path: /sunstealer-platform(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: sunstealer-platform
+                port:
+                  number: 8080
