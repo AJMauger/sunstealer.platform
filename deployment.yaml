@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sunstealer-platform
+  name: sunstealer-platform
+  namespace: ajm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sunstealer-platform
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: sunstealer-platform
+    spec:
+      imagePullSecrets:
+        - name: registry
+      containers:
+        - name: sunstealer-platform
+          image: ajmfco42-01.ajm.net:5000/sunstealer-platform:latest
+          env:
+          ports:
+            - containerPort: 8080
+              name: w3
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: sunstealer-platform
+  namespace: ajm
+spec:
+  selector:
+    app: sunstealer-platform
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sunstealer-platform
+  namespace: ajm
+  annotations:
+    konghq.com/preserve-host: "true"
+    konghq.com/regex-priority: "1"
+    konghq.com/rewrite: /$1
+    konghq.com/strip-path: "true"
+spec:
+  ingressClassName: kong
+  tls:
+  - hosts:
+    - ajmfco42-01.ajm.net
+    secretName: kong-proxy-tls
+  rules:
+  - host: ajmfco42-01.ajm.net
+    http:
+      paths:
+      - path: /~/sunstealer-platform/(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: sunstealer-platform
+            port:
+              number: 8080

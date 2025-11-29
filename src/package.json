@@ -1,0 +1,57 @@
+{
+  "name": "sunstealer.platform",
+  "version": "1.0.0",
+  "description": "sunstealer platform",
+  "main": ".dist/index.js",
+  "scripts": {
+    "build": "npm run clean && webpack --config webpack.config.ts --mode development",
+    "clean": "run-script-os",
+    "clean:linux": "rm -f dist/* || true",
+    "clean:win32": "del /Q .\\dist\\*",
+    "start": "npm run build && node dist/index.js",
+    "test": "test"
+  },
+  "keywords": [
+    "sunstealer",
+    "platform"
+  ],
+  "author": "ajm",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.6",
+    "@types/cors": "^2.8.19",
+    "@types/dotenv-webpack": "^7.0.8",
+    "@types/express": "^5.0.5",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/jwk-to-pem": "^2.0.3",
+    "@types/node": "^24.9.2",
+    "@types/nodemon": "^1.19.6",
+    "@types/webpack": "^5.28.5",
+    "axios": "^1.13.1",
+    "body-parser": "^2.2.0",
+    "buffer": "^6.0.3",
+    "cors": "^2.8.5",
+    "crypto-browserify": "^3.12.1",
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.4",
+    "jsonwebtoken": "^9.0.2",
+    "jwk-to-pem": "^2.0.7",
+    "mongodb": "^6.20.0",
+    "nodemon-webpack-plugin": "^4.8.2",
+    "process": "^0.11.10",
+    "run-script-os": "^1.1.6",
+    "stream-browserify": "^3.0.0",
+    "style-loader": "^4.0.0",
+    "svg-url-loader": "^8.0.0",
+    "ts-loader": "^9.5.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "url-loader": "^4.1.1",
+    "util": "^0.12.5",
+    "webpack": "^5.102.1",
+    "webpack-cli": "^6.0.1"
+  }
+}
